@@ -25,29 +25,31 @@ searchUrls.forEach(async (item, index, array) => {
 	let $ = cheerio.load(html);
 
 	console.log(
-		`getting data url from search urls [${step1Processed + 1}/${
-			searchUrls.length
-		}]`
+		`Requesting Search URL [${step1Processed + 1}/${searchUrls.length}]`
 	);
 	try {
+		let cardNum = 0;
 		// BigCardList
 		$("#MainContentPlaceHolder_Panel1 .tnresult--card.jq-cardhover").each(
-			(i, element) => {
+			(i, element, array) => {
 				const item = $(element)
 					.find(".relative")
 					.find("a")
 					.attr("href")
 					.trim();
 				links.push(item);
+				cardNum += 1;
 			}
 		);
 		// SmallCardList
 		$(
 			"#MainContentPlaceHolder_Panel1 .tnresult--small--card.bottom_card"
-		).each((i, element) => {
+		).each((i, element, array) => {
 			const item = $(element).find("a").attr("href").trim();
 			links.push(item);
+			cardNum += 1;
 		});
+		console.log(`└── Collected Data URL [${cardNum}]\n`);
 	} catch (err) {
 		console.error(err);
 	}
@@ -68,12 +70,13 @@ function step2() {
 		let $ = cheerio.load(html);
 
 		console.log(
-			`getting data from data urls [${step2Processed + 1}/${
-				links.length
-			}]`
+			`├── Collecting Data [${step2Processed + 1}/${links.length}]`
 		);
 
 		try {
+			let data = {};
+			let url = item;
+			data["URL"] = url;
 			let phone = $(".inquiry--hdr--lt > .prem--owner--phn > p > a")
 				.text()
 				.split("\n")[1]
@@ -82,29 +85,84 @@ function step2() {
 				.text()
 				.split("\n")[1]
 				.trim();
-			let url = item;
-			extractData.push({ Contact: contact, Phone: phone, URL: url });
+			let infoType = $("#divsinglePropertyDetail > ul > li > small")
+				.map((index, item) => $(item).text().trim())
+				.get();
+			let infoVal = $("#divsinglePropertyDetail > ul > li > span")
+				.map((index, item) => $(item).text().trim())
+				.get();
+
+			// location
+			let address = $(
+				"#propertyDetailMainContainer > div > div.prop--dtl--lt > div.breadcrumbs--container > div > span"
+			)
+				.text()
+				.trim();
+			let basename = $(
+				"#propertyDetailMainContainer > div > div.prop--dtl--lt > div.breadcrumbs--container > div > a:nth-child(3)"
+			)
+				.attr("basename")
+				.trim();
+
+			let statecode = $(
+				"#propertyDetailMainContainer > div > div.prop--dtl--lt > div.breadcrumbs--container > div > a:nth-child(3)"
+			)
+				.attr("statecode")
+				.trim();
+			let location = `${address} in ${basename}, ${statecode}`;
+			data["Contact Name"] = contact;
+			data["Phone Number"] = phone;
+			data["Location"] = location;
+
+			for (let i = 0; i < infoType.length; i++) {
+				data[infoType[i]] = infoVal[i];
+			}
+			let detailsType = $(
+				"#pdpDetails > div.prop--cont--blk > ul > li > div.dtls--opt--cont > small"
+			)
+				.map((index, item) => $(item).text().trim())
+				.get();
+			let detailsVal = $(
+				"#pdpDetails > div.prop--cont--blk > ul > li > div.dtls--opt--cont > span"
+			)
+				.map((index, item) => $(item).text().trim())
+				.get();
+
+			for (let i = 0; i < detailsType.length; i++) {
+				data[detailsType[i]] = detailsVal[i];
+			}
+
+			extractData.push(data);
 		} catch (err) {
 			console.error(err);
 		}
 
 		step2Processed++;
 		if (step2Processed === array.length) {
-			step3();
+			step3(extractData);
 		}
 	});
 }
 
 ////////////// Step-3
-function step3() {
-	console.log("\nSaving Data to New_Data.xlsx");
+function step3(finalData) {
 	// Writing our New_Data.xlsx file
 	const newWB = xlsx.utils.book_new();
-	const newWS = xlsx.utils.json_to_sheet(extractData);
+	const newWS = xlsx.utils.json_to_sheet(finalData);
 	xlsx.utils.book_append_sheet(newWB, newWS, "New_Data");
 	xlsx.writeFile(newWB, "./New_Data.xlsx");
-	console.log("All Done ✔");
+	console.log("\nAll Done ✔");
 	console.log(
 		'Please copy "New_Data.xlsx" to any safe area. next time it will overwrite!'
 	);
 }
+
+// function isStringContainsNumber(_input) {
+// 	let string1 = String(_input);
+// 	for (let i = 0; i < string1.length; i++) {
+// 		if (!isNaN(string1.charAt(i)) && !(string1.charAt(i) === " ")) {
+// 			return i;
+// 		}
+// 	}
+// 	return false;
+// }
