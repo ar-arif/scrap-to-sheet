@@ -1,17 +1,15 @@
 {
-  "name": "beautifulsoup",
+  "name": "scrape-data-by-cheerio",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node main",
+    "dev": "nodemon main"
   },
   "license": "MIT",
   "dependencies": {
     "axios": "^0.25.0",
     "cheerio": "^1.0.0-rc.10",
-    "exceljs": "^4.3.0",
-    "prompt-sync": "^4.2.0",
     "xlsx": "^0.17.5"
   }
 }
