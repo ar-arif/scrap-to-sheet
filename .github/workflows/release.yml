@@ -16,8 +16,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 17
-      - run: npm ci
-      - run: pkg app.js
+      - run: npm i
+      - run: pkg --out-path=dist/ app.js
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
