@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "build": "pkg --out-path=dist app.js",
     "release": "standard-version"
   },
   "license": "MIT",
