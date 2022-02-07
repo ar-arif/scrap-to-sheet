@@ -1,6 +1,6 @@
 {
   "name": "scrape-data-by-cheerio",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
