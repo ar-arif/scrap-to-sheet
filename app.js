@@ -24,10 +24,10 @@ searchUrls.forEach(async (item, index, array) => {
 	let html = response.data;
 	let $ = cheerio.load(html);
 
-	console.log(
-		`Requesting Search URL [${step1Processed + 1}/${searchUrls.length}]`
-	);
 	try {
+		console.log(
+			`Requesting Search URL [${step1Processed + 1}/${searchUrls.length}]`
+		);
 		let cardNum = 0;
 		// BigCardList
 		$("#MainContentPlaceHolder_Panel1 .tnresult--card.jq-cardhover").each(
@@ -49,7 +49,7 @@ searchUrls.forEach(async (item, index, array) => {
 			links.push(item);
 			cardNum += 1;
 		});
-		console.log(`└── Collected Data URL [${cardNum}]\n`);
+		console.log(`└── Collected Data's URL [${cardNum}]\n`);
 	} catch (err) {
 		console.error(err);
 	}
@@ -69,11 +69,10 @@ function step2() {
 		let html = response.data;
 		let $ = cheerio.load(html);
 
-		console.log(
-			`├── Collecting Data [${step2Processed + 1}/${links.length}]`
-		);
-
 		try {
+			console.log(
+				`├── Collecting Data [${step2Processed + 1}/${links.length}]`
+			);
 			let data = {};
 			let url = item;
 			data["URL"] = url;
@@ -155,14 +154,11 @@ function step3(finalData) {
 	console.log(
 		'Please copy "New_Data.xlsx" to any safe area. next time it will overwrite!'
 	);
-}
 
-// function isStringContainsNumber(_input) {
-// 	let string1 = String(_input);
-// 	for (let i = 0; i < string1.length; i++) {
-// 		if (!isNaN(string1.charAt(i)) && !(string1.charAt(i) === " ")) {
-// 			return i;
-// 		}
-// 	}
-// 	return false;
-// }
+	console.log("Press enter key to exit!");
+	if (process.stdin.isTTY) {
+		process.stdin.setRawMode(true);
+	}
+	process.stdin.resume();
+	process.stdin.on("data", process.exit.bind(process, 0));
+}
